@@ -47,23 +47,31 @@ To run this project locally, ensure you have the following installed:
 4. **Environment Variables**:
    Ensure you have a `.env` file inside the `backend` directory. It should look like this:
    ```env
-   PORT=5000
+   PORT=3000
    DB_HOST=localhost
-   DB_USER=root
+   DB_USER=your_mysql_username
    DB_PASSWORD=your_mysql_password
-   DB_NAME=library_management
-   JWT_SECRET=your_jwt_secret_key
+   DB_NAME=library_db
+   JWT_SECRET=your_super_secret_jwt_key
    ```
    *(Update the credentials according to your local MySQL setup)*
 
 ## Database Setup
 
-To automatically create the database structure and seed initial data (such as books and a default librarian account), run the following command from the `backend` folder:
+The project includes automated scripts to create the tables and populate initial mock data (including the default librarian and admin accounts).
+
+Run the following scripts in order from the `backend` folder, or simply use `npm run setup`:
 
 ```bash
-npm run setup
+# 1. Create the database schema and tables
+node setup_db.js
+
+# 2. Seed the database with sample books
+node seed_books.js
+
+# 3. Seed the database with mock librarian data
+node seed_librarian.js
 ```
-*(This command runs `node setup_db.js` followed by `npm run seed` to insert initial records).*
 
 ## Running the Application
 
@@ -78,7 +86,7 @@ npm run setup
 
 2. Open your browser and navigate to:
    ```text
-   http://localhost:5000
+   http://localhost:3000
    ```
    *Note: The Express backend serves the static frontend files directly from the `frontend` directory.*
 
