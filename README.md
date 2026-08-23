@@ -1,67 +1,91 @@
-# Library Management System
+# Savant - Premium Library Management System
 
-A robust, full-stack Library Management System featuring a custom Single Page Application (SPA) frontend built with vanilla web technologies, and a secure REST API backend featuring Role-Based Access Control (RBAC).
+Welcome to **Savant**, an academic library management system. A seamless, powerful, and elegant solution for students and administrators alike.
 
-## 🚀 Tech Stack
+## Features
 
-- **Frontend:** Vanilla HTML5, CSS3 (with custom variables for Light/Dark mode transitions), JavaScript.
-- **Backend:** Node.js, Express (v5).
-- **Database:** MySQL (using a promise-based connection pool via `mysql2`).
-- **Security:** JSON Web Tokens (JWT) for session authentication, bcrypt for password hashing.
+- **Public Catalog**: Browse the open catalog of books without logging in.
+- **Member Registration & Authentication**: Secure sign up and login using JWT and bcrypt.
+- **Role-Based Dashboard**: Different views and capabilities for regular users/members versus administrators/librarians.
+- **Book Management**: Add, update, or remove books from the library.
+- **Transactions**: Track borrowed and returned books.
+- **Modern UI**: A responsive, beautifully designed frontend interface powered by vanilla HTML/CSS/JS, Inter fonts, and Phosphor icons.
 
----
+## Tech Stack
 
-## 🛠️ Prerequisites
+- **Frontend**: Vanilla HTML5, CSS3, Vanilla JavaScript
+- **Backend**: Node.js, Express.js
+- **Database**: MySQL
+- **Authentication**: JWT (JSON Web Tokens), bcrypt for password hashing
 
-Before running this project, make sure you have the following installed:
-- [Node.js](https://nodejs.org/) (v16 or higher recommended)
-- [MySQL Server](https://dev.mysql.com/downloads/installer/)
+## Prerequisites
 
----
+To run this project locally, ensure you have the following installed:
 
-## 🏃‍♂️ Getting Started
+- **Node.js**: (v14 or higher recommended)
+- **MySQL**: (Make sure the MySQL server is running)
 
-Follow these step-by-step instructions to set up and run the project locally on your machine.
+## Setup & Installation
 
-### 1. Clone the Repository
+1. **Clone the repository** (if you haven't already):
+   ```bash
+   git clone <your-repository-url>
+   cd <repository-directory>
+   ```
+
+2. **Navigate to the backend directory**:
+   The backend handles both the API and serves the static frontend files.
+   ```bash
+   cd backend
+   ```
+
+3. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+4. **Environment Variables**:
+   Ensure you have a `.env` file inside the `backend` directory. It should look like this:
+   ```env
+   PORT=5000
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=library_management
+   JWT_SECRET=your_jwt_secret_key
+   ```
+   *(Update the credentials according to your local MySQL setup)*
+
+## Database Setup
+
+To automatically create the database structure and seed initial data (such as books and a default librarian account), run the following command from the `backend` folder:
+
 ```bash
-git clone <your-repository-url>
-cd LLM
+npm run setup
+```
+*(This command runs `node setup_db.js` followed by `npm run seed` to insert initial records).*
 
+## Running the Application
 
-2. Configure Environment Variables
-Navigate to the backend folder and look for the .env configuration. If it doesn't exist, create a .env file inside the backend/ directory:
-cd backend
+1. Start the server from the `backend` directory:
+   ```bash
+   # For production mode
+   npm start
+   
+   # For development mode (uses nodemon)
+   npm run dev
+   ```
 
-Open the .env file and add your database credentials and local server configuration:
+2. Open your browser and navigate to:
+   ```text
+   http://localhost:5000
+   ```
+   *Note: The Express backend serves the static frontend files directly from the `frontend` directory.*
 
-PORT=3000
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=library_db
-JWT_SECRET=your_super_secret_jwt_key
+## Folder Structure
 
-3. Install Dependencies
-While inside the backend directory, run the following command to install the required Node.js packages:
-npm install
+- `/backend`: Contains the Node.js Express server, API routes, database configuration (`db.js`), schema and seed scripts.
+- `/frontend`: Contains the vanilla frontend source code (HTML, CSS, JS).
 
-4. Setup and Seed the Database
-The project includes automated scripts to create the tables and populate initial mock data (including the default librarian and admin accounts).
-
-Run the following scripts in order:
-# 1. Create the database schema and tables
-node setup_db.js
-
-# 2. Seed the database with sample books
-node seed_books.js
-
-# 3. Seed the database with mock librarian data
-node seed_librarian.js
-
-5. Start the Server
-Start your local development backend server:
-npm start
-
-
-http://localhost:3000.
+## License
+ISC
