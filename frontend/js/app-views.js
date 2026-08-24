@@ -315,7 +315,7 @@ async function renderCirculationView() {
 async function renderBookManagerView() {
     let addFormHTML = '';
     
-    if (currentUser.role === 'Admin') {
+    if (currentUser.role === 'Admin' || currentUser.role === 'Librarian') {
         addFormHTML = `
              <div class="action-bar flex-wrap">
                  <!-- Add Book Mini Form -->
@@ -353,7 +353,7 @@ async function renderBookManagerView() {
         </div>
     `;
 
-    if (currentUser.role === 'Admin') {
+    if (currentUser.role === 'Admin' || currentUser.role === 'Librarian') {
         document.getElementById('add-book-form').addEventListener('submit', async (e) => {
          e.preventDefault();
          const payload = {
@@ -405,7 +405,7 @@ async function fetchInventoryList() {
                             <th>Details</th>
                             <th>ISBN</th>
                             <th>Stock</th>
-                            ${currentUser.role === 'Admin' ? '<th>Actions</th>' : ''}
+                            ${(currentUser.role === 'Admin' || currentUser.role === 'Librarian') ? '<th>Actions</th>' : ''}
                         </tr>
                     </thead>
                     <tbody>
@@ -413,7 +413,7 @@ async function fetchInventoryList() {
 
          books.forEach((b, index) => {
               let actionCol = '';
-              if (currentUser.role === 'Admin') {
+              if (currentUser.role === 'Admin' || currentUser.role === 'Librarian') {
                   actionCol = `
                     <td>
                         <button onclick="deleteBook(${b.ID})" class="btn-icon btn-danger" style="padding: 0.25rem 0.5rem;" title="Delete Book"><i class="ph ph-trash"></i></button>

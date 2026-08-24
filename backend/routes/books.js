@@ -72,7 +72,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Add a new book (Admin only)
-router.post('/', authenticateToken, authorizeRole(['Admin']), async (req, res) => {
+router.post('/', authenticateToken, authorizeRole(['Admin', 'Librarian']), async (req, res) => {
     try {
         const { title, author, isbn, category, stock } = req.body;
         
@@ -96,7 +96,7 @@ router.post('/', authenticateToken, authorizeRole(['Admin']), async (req, res) =
 });
 
 // Update a book (Admin only)
-router.put('/:id', authenticateToken, authorizeRole(['Admin']), async (req, res) => {
+router.put('/:id', authenticateToken, authorizeRole(['Admin', 'Librarian']), async (req, res) => {
     try {
         const { title, author, isbn, category, stock } = req.body;
         
@@ -114,7 +114,7 @@ router.put('/:id', authenticateToken, authorizeRole(['Admin']), async (req, res)
 });
 
 // Delete a book (Admin only)
-router.delete('/:id', authenticateToken, authorizeRole(['Admin']), async (req, res) => {
+router.delete('/:id', authenticateToken, authorizeRole(['Admin', 'Librarian']), async (req, res) => {
     try {
         const [result] = await db.query('DELETE FROM Books WHERE ID = ?', [req.params.id]);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Book not found' });
