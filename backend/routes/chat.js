@@ -160,11 +160,14 @@ const LIBRARY_FAQS = {
 
 // Helper: Call Google Gemini API if API key is provided
 async function callGeminiIfAvailable(userMessage, booksContext) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : null;
     if (!apiKey) return null;
 
-    try {
-        const prompt = `You are "Savant AI", an expert and friendly academic library assistant at a university.
+    const models = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest'];
+
+    for (const model of models) {
+        try {
+            const prompt = `You are "Savant AI", an expert and friendly academic library assistant at a university.
 You help students with library rules, books, and in-depth academic explanations of concepts in computer science, software engineering, databases, programming, and mathematics.
 
 LIBRARY CATALOG CONTEXT:
@@ -178,31 +181,31 @@ INSTRUCTIONS:
 2. If relevant, reference the matching book code (e.g. MCS-023 or BCS-051) from our library catalog.
 3. Keep the response concise, engaging, and well-formatted with markdown bolding and bullet points.`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    maxOutputTokens: 600,
-                    temperature: 0.7
-                }
-            })
-        });
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        maxOutputTokens: 600,
+                        temperature: 0.7
+                    }
+                })
+            });
 
-        if (!response.ok) {
-            const errText = await response.text();
-            console.error("Gemini API HTTP Error:", response.status, errText);
-            return null;
+            if (response.ok) {
+                const result = await response.json();
+                const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (replyText) return replyText;
+            } else {
+                const errText = await response.text();
+                console.warn(`Gemini model ${model} error:`, response.status, errText);
+            }
+        } catch (err) {
+            console.warn(`Gemini attempt with ${model} failed:`, err.message);
         }
-
-        const result = await response.json();
-        const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        return replyText || null;
-    } catch (err) {
-        console.error("Gemini API call failed:", err.message);
-        return null;
     }
+    return null;
 }
 
 // POST /api/chat
@@ -232,7 +235,34 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // 2. Check for General Library Policy FAQs
+        // 2. If GEMINI_API_KEY is configured, use Google Gemini AI to answer questions intelligently
+        if (process.env.GEMINI_API_KEY) {
+            try {
+                const [allBooks] = await db.query("SELECT Title, Author, ISBN, Category, Stock FROM Books LIMIT 25");
+                const catalogSummary = allBooks.map(b => `- ${b.Title} (${b.ISBN}) [${b.Category}] - Stock: ${b.Stock}`).join('\n');
+                const geminiReply = await callGeminiIfAvailable(message, catalogSummary);
+                if (geminiReply) {
+                    // Try to attach any relevant books mentioned in the question or answer
+                    const [matchedBooks] = await db.query(
+                        `SELECT Title, Author, ISBN, Category, Stock FROM Books 
+                         WHERE LOWER(?) LIKE CONCAT('%', LOWER(ISBN), '%') 
+                            OR LOWER(?) LIKE CONCAT('%', LOWER(Title), '%') 
+                         LIMIT 3`,
+                        [query + ' ' + geminiReply, query]
+                    );
+
+                    return res.json({
+                        reply: geminiReply,
+                        books: matchedBooks || [],
+                        chips: ["🔍 Check book availability", "📖 Borrowing rules", "📚 Browse catalog"]
+                    });
+                }
+            } catch (err) {
+                console.error("Gemini flow fallback:", err.message);
+            }
+        }
+
+        // 3. Check for General Library Policy FAQs
         for (const [key, faq] of Object.entries(LIBRARY_FAQS)) {
             const hasKeyword = faq.keywords.some(kw => query.includes(kw));
             if (hasKeyword) {
@@ -244,7 +274,7 @@ router.post('/', async (req, res) => {
             }
         }
 
-        // 3. Check for Specific Academic Concepts / Book Questions in Built-in Knowledge Base
+        // 4. Check for Specific Academic Concepts / Book Questions in Built-in Knowledge Base
         for (const [key, book] of Object.entries(BOOK_KNOWLEDGE)) {
             const mentionsBook = query.includes(key) || 
                                  query.includes(book.code.toLowerCase()) || 
@@ -286,24 +316,6 @@ router.post('/', async (req, res) => {
                         });
                     }
                 }
-            }
-        }
-
-        // 4. If GEMINI_API_KEY is configured, use Google Gemini AI to answer ANY academic question
-        if (process.env.GEMINI_API_KEY) {
-            try {
-                const [allBooks] = await db.query("SELECT Title, Author, ISBN, Category, Stock FROM Books LIMIT 20");
-                const catalogSummary = allBooks.map(b => `- ${b.Title} (${b.ISBN}) [${b.Category}] - Stock: ${b.Stock}`).join('\n');
-                const geminiReply = await callGeminiIfAvailable(message, catalogSummary);
-                if (geminiReply) {
-                    return res.json({
-                        reply: geminiReply,
-                        books: [],
-                        chips: ["🔍 Check book availability", "📖 How to borrow", "📚 Browse catalog"]
-                    });
-                }
-            } catch (err) {
-                console.error("Gemini flow fallback:", err.message);
             }
         }
 
