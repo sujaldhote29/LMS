@@ -9,6 +9,7 @@
     <!-- Phosphor Icons for elegant minimalist UI -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/chatbot.css">
 </head>
 <body>
 
@@ -296,8 +297,52 @@
         </div>
     </div>
 
-    <!-- Application Script -->
+    <!-- Floating Chatbot Widget -->
+    <div id="chatbot-launcher" class="chatbot-launcher" title="Chat with Library AI">
+        <i class="ph ph-sparkle"></i>
+        <div id="chatbot-badge" class="chatbot-badge"></div>
+    </div>
+
+    <div id="chatbot-window" class="chatbot-window">
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar">
+                    <i class="ph ph-sparkle"></i>
+                </div>
+                <div class="chatbot-title">
+                    <h4>Savant AI Assistant</h4>
+                    <span>Active Now</span>
+                </div>
+            </div>
+            <div class="chatbot-actions">
+                <button id="chatbot-clear-btn" class="chatbot-btn-action" title="Clear Chat">
+                    <i class="ph ph-trash"></i>
+                </button>
+                <button id="chatbot-close-btn" class="chatbot-btn-action" title="Minimize">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="chatbot-messages" class="chatbot-messages">
+            <!-- Messages inserted dynamically -->
+        </div>
+
+        <div id="chatbot-chips" class="chatbot-chips">
+            <!-- Quick prompt chips -->
+        </div>
+
+        <div class="chatbot-footer">
+            <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask about books, rules, fines..." autocomplete="off">
+            <button id="chatbot-send-btn" class="chatbot-send-btn" title="Send Message">
+                <i class="ph ph-paper-plane-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Scripts -->
     <script src="js/app.js?v=9"></script>
     <script src="js/app-views.js?v=9"></script>
+    <script src="js/chatbot.js"></script>
 </body>
 </html>

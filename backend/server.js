@@ -17,6 +17,7 @@ const bookRoutes = require('./routes/books');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/users');
 const reportRoutes = require('./routes/reports');
+const chatRoutes = require('./routes/chat');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
@@ -24,6 +25,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/chat', chatRoutes);
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
