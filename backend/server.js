@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -23,7 +25,6 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 // Serve static frontend files
-const path = require('path');
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Basic API status route

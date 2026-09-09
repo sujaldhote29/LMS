@@ -1,4 +1,7 @@
-const API_URL = 'http://localhost:5000/api';
+// Dynamic API URL: uses relative '/api' on production or when served by Express, and falls back to localhost:5000 for standalone live-server development
+const API_URL = (window.location.port === '5500' || window.location.port === '5501')
+    ? 'http://localhost:5000/api'
+    : '/api';
 
 // --- State Management ---
 let currentUser = null;
